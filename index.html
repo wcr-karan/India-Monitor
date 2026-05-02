@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary Meta Tags -->
+    <title>India Monitor — Real-Time India Intelligence Dashboard</title>
+    <meta name="title" content="India Monitor — Real-Time India Intelligence Dashboard" />
+    <meta name="description" content="Real-time India intelligence dashboard. Track markets (BSE/NSE), weather, politics, defense, economy, technology, and more — all in one view." />
+    <meta name="keywords" content="India dashboard, BSE SENSEX, NIFTY 50, India news, Indian economy, DRDO, Indian military, monsoon tracker, India weather, startup India, Indian politics, India monitor, India intelligence" />
+    <meta name="author" content="IndiaMonitor" />
+    <meta name="theme-color" content="#0a0f0a" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="India Monitor — Real-Time India Intelligence Dashboard" />
+    <meta property="og:description" content="Real-time India intelligence dashboard. Markets, weather, politics, defense, economy, technology — all in one view." />
+    <meta property="og:site_name" content="India Monitor" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Theme init (avoid FOUC) -->
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('india-monitor-theme');
+          if (t === 'light') document.documentElement.dataset.theme = 'light';
+          else document.documentElement.dataset.theme = 'dark';
+        } catch(e) {}
+        document.documentElement.classList.add('no-transition');
+      })();
+    </script>
+
+    <link rel="stylesheet" href="/src/styles/main.css" />
+
+    <!-- Skeleton CSS (inline for instant load) -->
+    <style>
+      .skeleton-shell{display:flex;flex-direction:column;height:100vh;background:#0a0a0a;font-family:'JetBrains Mono','SF Mono',monospace;overflow:hidden}
+      .skeleton-header{display:flex;align-items:center;justify-content:space-between;height:44px;padding:8px 16px;background:#111;border-bottom:1px solid #1e1e1e;flex-shrink:0}
+      .skeleton-header-left{display:flex;align-items:center;gap:12px}
+      .skeleton-pill{height:24px;border-radius:6px;background:#1a1a1a}
+      .skeleton-dot{width:8px;height:8px;border-radius:50%;background:#138808}
+      .skeleton-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+      .skeleton-map{height:45vh;min-height:200px;background:#050a08;border-bottom:1px solid #1e1e1e}
+      .skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px;padding:4px;flex:1;overflow:hidden}
+      .skeleton-panel{background:#111;border:1px solid #1e1e1e;display:flex;flex-direction:column}
+      .skeleton-panel-header{height:36px;display:flex;align-items:center;padding:0 12px;border-bottom:1px solid #1a1a1a}
+      .skeleton-panel-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px}
+      .skeleton-line{height:14px;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:skel 1.5s infinite}
+      .skeleton-line.w85{width:85%}.skeleton-line.w75{width:75%}.skeleton-line.w60{width:60%}.skeleton-line.w50{width:50%}.skeleton-line.w40{width:40%}
+      @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Pre-render skeleton -->
+      <div class="skeleton-shell" aria-hidden="true">
+        <div class="skeleton-header">
+          <div class="skeleton-header-left">
+            <div class="skeleton-pill" style="width:140px"></div>
+            <div class="skeleton-pill" style="width:72px"></div>
+            <div class="skeleton-dot"></div>
+          </div>
+        </div>
+        <div class="skeleton-main">
+          <div class="skeleton-map"></div>
+          <div class="skeleton-grid">
+            <div class="skeleton-panel"><div class="skeleton-panel-header"><div class="skeleton-pill" style="width:80px;height:14px"></div></div><div class="skeleton-panel-body"><div class="skeleton-line w85"></div><div class="skeleton-line w75"></div><div class="skeleton-line w60"></div><div class="skeleton-line"></div><div class="skeleton-line w50"></div></div></div>
+            <div class="skeleton-panel"><div class="skeleton-panel-header"><div class="skeleton-pill" style="width:64px;height:14px"></div></div><div class="skeleton-panel-body"><div class="skeleton-line w75"></div><div class="skeleton-line"></div><div class="skeleton-line w60"></div><div class="skeleton-line w85"></div></div></div>
+            <div class="skeleton-panel"><div class="skeleton-panel-header"><div class="skeleton-pill" style="width:96px;height:14px"></div></div><div class="skeleton-panel-body"><div class="skeleton-line"></div><div class="skeleton-line w60"></div><div class="skeleton-line w85"></div><div class="skeleton-line w50"></div></div></div>
+            <div class="skeleton-panel"><div class="skeleton-panel-header"><div class="skeleton-pill" style="width:72px;height:14px"></div></div><div class="skeleton-panel-body"><div class="skeleton-line w60"></div><div class="skeleton-line w85"></div><div class="skeleton-line w75"></div><div class="skeleton-line"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <noscript>
+      <div style="max-width:800px;margin:0 auto;padding:40px 20px;font-family:system-ui;color:#e5e5e5;background:#0a0a0a;">
+        <h1>🇮🇳 India Monitor — Real-Time India Intelligence Dashboard</h1>
+        <p>Track Indian markets, weather, politics, defense, economy, and technology in real-time.</p>
+      </div>
+    </noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
