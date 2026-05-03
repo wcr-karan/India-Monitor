@@ -1,0 +1,400 @@
+/* ============================================
+   INDIA MONITOR — Design System
+   Inspired by WorldMonitor's dark intelligence UI
+   ============================================ */
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); overflow: hidden; height: 100vh; }
+.no-transition * { transition: none !important; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-default); }
+
+/* --- CSS Variables (Dark) --- */
+:root, [data-theme="dark"] {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #161616;
+  --bg-panel: #111111;
+  --bg-panel-header: #0e0e0e;
+  --bg-hover: #1a1a1a;
+  --bg-active: #222;
+  --bg-map: #050a08;
+  --text-primary: #e5e5e5;
+  --text-secondary: #999;
+  --text-muted: #666;
+  --text-accent: #4ade80;
+  --border-default: #2a2a2a;
+  --border-subtle: #1e1e1e;
+  --border-active: #3a3a3a;
+  --accent-saffron: #FF9933;
+  --accent-green: #138808;
+  --accent-blue: #000080;
+  --accent-green-bright: #4ade80;
+  --accent-red: #ef4444;
+  --accent-yellow: #facc15;
+  --accent-orange: #f97316;
+  --positive: #22c55e;
+  --negative: #ef4444;
+  --mono-font: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --sans-font: 'Inter', system-ui, sans-serif;
+  --header-height: 44px;
+  --panel-gap: 4px;
+  --panel-radius: 0px;
+  --shadow-panel: 0 1px 3px rgba(0,0,0,.4);
+  --shadow-glow: 0 0 20px rgba(19,136,8,.1);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #fff;
+  --bg-tertiary: #fafafa;
+  --bg-panel: #fff;
+  --bg-panel-header: #fafafa;
+  --bg-hover: #f0f0f0;
+  --bg-active: #e8e8e8;
+  --bg-map: #e0eee8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --text-muted: #999;
+  --text-accent: #138808;
+  --border-default: #ddd;
+  --border-subtle: #e8e8e8;
+  --border-active: #ccc;
+  --shadow-panel: 0 1px 3px rgba(0,0,0,.08);
+}
+
+/* --- App Layout --- */
+#app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* --- Header --- */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: var(--header-height); padding: 0 16px;
+  background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0; z-index: 100; position: relative;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+.app-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono-font); font-weight: 600; font-size: 13px;
+  color: var(--text-primary); letter-spacing: 0.5px; text-transform: uppercase;
+  cursor: default; user-select: none;
+}
+.logo-flag { font-size: 16px; }
+.logo-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent-green); }
+  50% { opacity: .6; box-shadow: 0 0 16px var(--accent-green); }
+}
+
+.header-time {
+  font-family: var(--mono-font); font-size: 11px; color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+.header-badge {
+  font-family: var(--mono-font); font-size: 10px; color: var(--accent-saffron);
+  background: rgba(255,153,51,.1); border: 1px solid rgba(255,153,51,.2);
+  padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;
+}
+.header-btn {
+  background: none; border: 1px solid var(--border-default); color: var(--text-secondary);
+  font-family: var(--mono-font); font-size: 11px; padding: 4px 10px;
+  border-radius: 4px; cursor: pointer; transition: all .2s;
+}
+.header-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-active); }
+.header-btn.active { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
+
+/* --- Main Layout --- */
+.app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* --- Map Section --- */
+.map-container {
+  height: 45vh; min-height: 220px; position: relative;
+  background: var(--bg-map); border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0; overflow: hidden;
+}
+.map-toolbar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; background: rgba(10,10,10,.85);
+  backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-subtle);
+}
+.map-toolbar-left, .map-toolbar-right { display: flex; align-items: center; gap: 8px; }
+.map-layer-btn {
+  background: rgba(255,255,255,.06); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary); font-family: var(--mono-font); font-size: 10px;
+  padding: 3px 8px; border-radius: 3px; cursor: pointer; transition: all .15s;
+}
+.map-layer-btn:hover { background: rgba(255,255,255,.1); color: var(--text-primary); }
+.map-layer-btn.active { background: rgba(19,136,8,.15); color: var(--accent-green-bright); border-color: rgba(19,136,8,.3); }
+.map-placeholder {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; color: var(--text-muted);
+  font-family: var(--mono-font); font-size: 12px; gap: 8px;
+}
+.map-placeholder-icon { font-size: 48px; opacity: .3; }
+
+/* --- India SVG Map --- */
+.india-svg-map { width: 100%; height: 100%; }
+.india-svg-map svg { width: 100%; height: 100%; }
+.state-path {
+  fill: rgba(19,136,8,.12); stroke: rgba(19,136,8,.3); stroke-width: 0.5;
+  transition: fill .2s, stroke .2s; cursor: pointer;
+}
+.state-path:hover { fill: rgba(19,136,8,.25); stroke: var(--accent-green-bright); stroke-width: 1; }
+.state-path.highlighted { fill: rgba(255,153,51,.2); stroke: var(--accent-saffron); }
+.state-tooltip {
+  position: absolute; background: rgba(0,0,0,.9); color: #fff; padding: 6px 10px;
+  border-radius: 4px; font-size: 11px; font-family: var(--mono-font);
+  pointer-events: none; z-index: 20; border: 1px solid var(--border-default);
+  backdrop-filter: blur(4px);
+}
+
+/* --- Panel Grid --- */
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--panel-gap); padding: var(--panel-gap);
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  align-content: start;
+}
+
+/* --- Panel Base --- */
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border-subtle);
+  border-radius: var(--panel-radius); display: flex; flex-direction: column;
+  min-height: 280px; max-height: 500px; overflow: hidden;
+  box-shadow: var(--shadow-panel); transition: border-color .2s;
+}
+.panel:hover { border-color: var(--border-default); }
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 12px; height: 36px; flex-shrink: 0;
+  background: var(--bg-panel-header); border-bottom: 1px solid var(--border-subtle);
+  cursor: default; user-select: none;
+}
+.panel-title {
+  font-family: var(--mono-font); font-size: 11px; font-weight: 500;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px;
+}
+.panel-title-icon { margin-right: 6px; font-size: 12px; }
+.panel-badge {
+  font-family: var(--mono-font); font-size: 9px; padding: 1px 6px;
+  border-radius: 3px; letter-spacing: 0.3px;
+}
+.panel-badge.live { background: rgba(239,68,68,.15); color: var(--accent-red); animation: pulse-badge 2s infinite; }
+@keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:.5} }
+.panel-actions { display: flex; align-items: center; gap: 4px; }
+.panel-action-btn {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  padding: 4px; border-radius: 3px; font-size: 12px; transition: all .15s;
+  line-height: 1;
+}
+.panel-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.panel-body { flex: 1; overflow-y: auto; padding: 0; position: relative; }
+
+/* --- News Items --- */
+.news-item {
+  display: flex; gap: 10px; padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle); cursor: pointer;
+  transition: background .15s;
+}
+.news-item:hover { background: var(--bg-hover); }
+.news-item:last-child { border-bottom: none; }
+.news-time {
+  font-family: var(--mono-font); font-size: 10px; color: var(--text-muted);
+  white-space: nowrap; min-width: 44px; padding-top: 2px;
+}
+.news-content { flex: 1; min-width: 0; }
+.news-headline {
+  font-size: 12px; color: var(--text-primary); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.news-source {
+  font-family: var(--mono-font); font-size: 10px; color: var(--text-muted);
+  margin-top: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.news-tag {
+  display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px;
+  margin-right: 4px; font-family: var(--mono-font); letter-spacing: 0.3px;
+}
+.news-tag.politics { background: rgba(99,102,241,.12); color: #818cf8; }
+.news-tag.economy { background: rgba(250,204,21,.12); color: #facc15; }
+.news-tag.defense { background: rgba(239,68,68,.12); color: #f87171; }
+.news-tag.tech { background: rgba(59,130,246,.12); color: #60a5fa; }
+.news-tag.sports { background: rgba(34,197,94,.12); color: #4ade80; }
+
+/* --- Market Ticker Items --- */
+.market-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-bottom: 1px solid var(--border-subtle);
+  transition: background .15s;
+}
+.market-item:hover { background: var(--bg-hover); }
+.market-name {
+  font-family: var(--mono-font); font-size: 11px; color: var(--text-primary);
+  font-weight: 500;
+}
+.market-label { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.market-values { text-align: right; }
+.market-price { font-family: var(--mono-font); font-size: 12px; color: var(--text-primary); font-weight: 500; }
+.market-change {
+  font-family: var(--mono-font); font-size: 10px; margin-top: 1px;
+}
+.market-change.positive { color: var(--positive); }
+.market-change.negative { color: var(--negative); }
+
+/* --- Weather Items --- */
+.weather-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
+.weather-card {
+  padding: 10px 12px; background: var(--bg-tertiary); transition: background .15s;
+}
+.weather-card:hover { background: var(--bg-hover); }
+.weather-city {
+  font-family: var(--mono-font); font-size: 10px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.weather-temp {
+  font-family: var(--mono-font); font-size: 22px; font-weight: 300;
+  color: var(--text-primary); margin-top: 2px;
+}
+.weather-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.weather-icon { font-size: 20px; float: right; margin-top: -4px; }
+
+/* --- Stat Cards (Economy/Defense) --- */
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; }
+.stat-card {
+  padding: 12px; background: var(--bg-tertiary); transition: background .15s;
+}
+.stat-card:hover { background: var(--bg-hover); }
+.stat-label {
+  font-family: var(--mono-font); font-size: 9px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.stat-value {
+  font-family: var(--mono-font); font-size: 18px; font-weight: 600;
+  color: var(--text-primary); margin-top: 4px;
+}
+.stat-change {
+  font-family: var(--mono-font); font-size: 10px; margin-top: 2px;
+}
+.stat-change.up { color: var(--positive); }
+.stat-change.down { color: var(--negative); }
+.stat-subtitle { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* --- State List (for State Dashboard) --- */
+.state-list-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; border-bottom: 1px solid var(--border-subtle);
+  font-size: 12px; transition: background .15s;
+}
+.state-list-item:hover { background: var(--bg-hover); }
+.state-name { color: var(--text-primary); }
+.state-metric { font-family: var(--mono-font); font-size: 11px; color: var(--text-accent); }
+
+/* --- Clock Panel --- */
+.clock-display {
+  text-align: center; padding: 20px;
+}
+.clock-time {
+  font-family: var(--mono-font); font-size: 42px; font-weight: 300;
+  color: var(--text-primary); letter-spacing: 2px;
+}
+.clock-date {
+  font-family: var(--mono-font); font-size: 12px; color: var(--text-secondary);
+  margin-top: 6px; letter-spacing: 0.5px;
+}
+.clock-label {
+  font-family: var(--mono-font); font-size: 10px; color: var(--accent-saffron);
+  margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;
+}
+.world-clocks { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; margin-top: 12px; }
+.world-clock-item { padding: 8px 12px; background: var(--bg-tertiary); }
+.world-clock-city {
+  font-family: var(--mono-font); font-size: 9px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.world-clock-time { font-family: var(--mono-font); font-size: 14px; color: var(--text-primary); margin-top: 2px; }
+
+/* --- Tricolor Accent Bar --- */
+.tricolor-bar {
+  height: 3px; display: flex; flex-shrink: 0;
+}
+.tricolor-bar .saffron { flex: 1; background: var(--accent-saffron); }
+.tricolor-bar .white { flex: 1; background: #fff; }
+.tricolor-bar .green { flex: 1; background: var(--accent-green); }
+
+/* --- Loading States --- */
+.panel-loading {
+  display: flex; flex-direction: column; gap: 10px; padding: 12px;
+}
+.shimmer-line {
+  height: 14px; border-radius: 4px;
+  background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.04) 75%);
+  background-size: 200% 100%; animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* --- Breaking News Banner --- */
+.breaking-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 6px 16px; background: rgba(239,68,68,.1);
+  border-bottom: 1px solid rgba(239,68,68,.2); flex-shrink: 0;
+  overflow: hidden;
+}
+.breaking-label {
+  font-family: var(--mono-font); font-size: 10px; font-weight: 700;
+  color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
+  white-space: nowrap; animation: pulse-badge 1.5s infinite;
+}
+.breaking-text {
+  font-size: 12px; color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .panel-grid { grid-template-columns: 1fr; }
+  .map-container { height: 30vh; min-height: 150px; }
+  .header-time, .header-badge { display: none; }
+  .weather-grid, .stat-grid { grid-template-columns: 1fr; }
+  .world-clocks { grid-template-columns: 1fr; }
+}
+@media (max-width: 1200px) {
+  .panel-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+}
+
+/* --- Animations --- */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn .3s ease-out; }
+
+/* --- AQI Colors --- */
+.aqi-good { color: #22c55e; }
+.aqi-moderate { color: #facc15; }
+.aqi-unhealthy-sensitive { color: #f97316; }
+.aqi-unhealthy { color: #ef4444; }
+.aqi-very-unhealthy { color: #a855f7; }
+.aqi-hazardous { color: #991b1b; }
+
+/* --- Scrollbar for panels --- */
+.panel-body::-webkit-scrollbar { width: 4px; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 2px; }
+
+/* --- Empty State --- */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; padding: 24px; color: var(--text-muted); text-align: center;
+  font-size: 12px; gap: 8px;
+}
+.empty-state-icon { font-size: 28px; opacity: .4; }
