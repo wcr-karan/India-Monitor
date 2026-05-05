@@ -3,6 +3,7 @@
 // ============================================
 import './styles/main.css';
 import { renderHeader } from './panels/header.js';
+import { renderBreakingBanner } from './panels/breaking.js';
 import { renderMap } from './panels/map.js';
 import { renderNewsPanel } from './panels/news.js';
 import { renderMarketsPanel } from './panels/markets.js';
@@ -32,6 +33,10 @@ function boot() {
   // Header
   const header = renderHeader();
   app.appendChild(header);
+
+  // Breaking News Banner
+  const breaking = renderBreakingBanner();
+  app.appendChild(breaking);
 
   // Main content
   const main = document.createElement('div');

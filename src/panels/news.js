@@ -73,3 +73,29 @@ function renderFallbackNews() {
     return `<div class="news-item"><div class="news-time">${n.time}</div><div class="news-content"><div class="news-headline">${tagHtml}${n.title}</div><div class="news-source">${n.source}</div></div></div>`;
   }).join('');
 }
+
+export function findBreakingNews(newsItems) {
+  if (!newsItems || !newsItems.length) return null;
+  
+  // Look for keywords in the first 5 items (most recent)
+  const breakingKeywords = ['breaking', 'urgent', 'alert', 'crisis', 'emergency', 'deadly', 'blasts', 'war', 'attack', 'dead', 'kills'];
+  
+  for (let i = 0; i < 5; i++) {
+    const item = newsItems[i];
+    if (!item) break;
+    const title = item.title.toLowerCase();
+    if (breakingKeywords.some(k => title.includes(k))) {
+      return item;
+    }
+  }
+  
+  // If no "breaking" keyword, just return the most recent one if it's very recent (within 30 mins)
+  const mostRecent = newsItems[0];
+  const pubDate = new Date(mostRecent.pubDate);
+  const now = new Date();
+  if ((now - pubDate) < 30 * 60 * 1000) {
+    return mostRecent;
+  }
+  
+  return null;
+}
