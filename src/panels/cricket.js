@@ -1,6 +1,6 @@
 // Cricket Panel — India's cultural pulse
 import { createPanel, showLoading } from './utils.js';
-import { fetchCricketNews } from '../services/data.js';
+import { fetchCricketNews, fetchLiveScores } from '../services/data.js';
 
 export function renderCricketPanel() {
   const { panel, body } = createPanel('cricket', 'Cricket Hub', '🏏', { 
@@ -19,24 +19,14 @@ async function loadCricket(container) {
   container.innerHTML = `
     <div style="padding:16px 12px;border-bottom:1px solid var(--border-subtle);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <span class="news-tag sports" style="font-size:10px;">IPL 2026 • LIVE</span>
+        <span class="news-tag sports" style="font-size:10px;">LIVE MATCHES</span>
         <span style="font-family:var(--mono-font);font-size:10px;color:var(--accent-red);animation:pulse-badge 1.5s infinite;">● LIVE</span>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div>
-          <div style="font-size:13px;color:var(--text-primary);font-weight:500;">Chennai Super Kings</div>
-          <div style="font-family:var(--mono-font);font-size:20px;color:var(--text-primary);margin-top:4px;">186/4 <span style="font-size:11px;color:var(--text-muted);">(18.2 ov)</span></div>
+      <div id="live-scores-feed">
+        <div class="panel-loading">
+          <div class="shimmer-line" style="width:100%"></div>
+          <div class="shimmer-line" style="width:80%"></div>
         </div>
-        <div style="font-family:var(--mono-font);font-size:10px;color:var(--accent-saffron);padding:4px 8px;background:rgba(255,153,51,.1);border-radius:4px;">BATTING</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-size:13px;color:var(--text-secondary);">Mumbai Indians</div>
-          <div style="font-family:var(--mono-font);font-size:16px;color:var(--text-secondary);margin-top:4px;">175/8 <span style="font-size:11px;color:var(--text-muted);">(20 ov)</span></div>
-        </div>
-      </div>
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-subtle);font-family:var(--mono-font);font-size:11px;color:var(--accent-green-bright);">
-        CSK need 12 runs from 10 balls
       </div>
     </div>
 
@@ -70,10 +60,38 @@ async function loadCricket(container) {
     </div>
   `;
 
-  // Fetch and render news
+  // Fetch and render data
   const newsFeed = container.querySelector('#cricket-news-feed');
-  const news = await fetchCricketNews();
+  const liveScoresFeed = container.querySelector('#live-scores-feed');
+
+  // Fetch data in parallel
+  const [news, liveScores] = await Promise.all([
+    fetchCricketNews(),
+    fetchLiveScores()
+  ]);
   
+  if (liveScoresFeed) {
+    if (liveScores.length > 0) {
+      liveScoresFeed.innerHTML = liveScores.slice(0, 4).map(item => `
+        <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer" onclick="window.open('${item.link}', '_blank')">
+          <div style="font-family:var(--mono-font);font-size:13px;color:var(--text-primary);font-weight:500;line-height:1.4;">
+            ${item.title}
+          </div>
+        </div>
+      `).join('');
+      
+      // Remove border from last item
+      const lastItem = liveScoresFeed.lastElementChild;
+      if (lastItem) {
+        lastItem.style.borderBottom = 'none';
+        lastItem.style.marginBottom = '0';
+        lastItem.style.paddingBottom = '0';
+      }
+    } else {
+      liveScoresFeed.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">No live matches at the moment.</div>';
+    }
+  }
+
   if (newsFeed) {
     if (news.length > 0) {
       newsFeed.innerHTML = news.map(item => `
@@ -88,5 +106,10 @@ async function loadCricket(container) {
     } else {
       newsFeed.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text-muted);">No news available at the moment.</div>';
     }
+  }
+  
+  // Restore scroll pos if it existed
+  if (scrollPos) {
+    container.scrollTop = scrollPos;
   }
 }

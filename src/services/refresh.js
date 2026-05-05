@@ -1,4 +1,4 @@
-// Auto-refresh scheduler
+
 import { loadNews } from '../panels/news.js';
 import { updateBreakingBanner } from '../panels/breaking.js';
 

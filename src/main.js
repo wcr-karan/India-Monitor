@@ -15,6 +15,7 @@ import { renderClockPanel } from './panels/clock.js';
 import { renderAirQualityPanel } from './panels/airquality.js';
 import { renderStatesPanel } from './panels/states.js';
 import { renderCricketPanel } from './panels/cricket.js';
+import { renderLiveTVPanel } from './panels/livetv.js';
 import { startAutoRefresh } from './services/refresh.js';
 
 function boot() {
@@ -52,6 +53,7 @@ function boot() {
   grid.id = 'panel-grid';
 
   // Add panels in order
+  grid.appendChild(renderLiveTVPanel());
   grid.appendChild(renderNewsPanel());
   grid.appendChild(renderCricketPanel());
   grid.appendChild(renderMarketsPanel());

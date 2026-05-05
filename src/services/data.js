@@ -56,6 +56,34 @@ export async function fetchCricketNews() {
   }
 }
 
+// ============================================
+// CRICKET LIVE SCORES
+// ============================================
+export async function fetchLiveScores() {
+  try {
+    const res = await fetchRSS('http://static.cricinfo.com/rss/livescores.xml', 'Live Score');
+    
+    // Prioritize India and IPL matches
+    const priorityKeywords = [
+      'India', 'Chennai', 'Mumbai', 'Royal Challengers', 'Bangalore', 'Bengaluru', 
+      'Delhi', 'Kolkata', 'Punjab', 'Rajasthan', 'Sunrisers', 'Hyderabad', 
+      'Gujarat', 'Lucknow', 'Titans', 'Super Giants', 'Capitals', 'Super Kings'
+    ];
+    
+    res.sort((a, b) => {
+      const aPriority = priorityKeywords.some(kw => a.title.includes(kw));
+      const bPriority = priorityKeywords.some(kw => b.title.includes(kw));
+      if (aPriority && !bPriority) return -1;
+      if (!aPriority && bPriority) return 1;
+      return 0;
+    });
+    
+    return res;
+  } catch {
+    return [];
+  }
+}
+
 async function fetchRSS(url, sourceName) {
   try {
     const res = await fetch(RSS_PROXY + encodeURIComponent(url), {
