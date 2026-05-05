@@ -148,17 +148,54 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-primary
 .india-svg-map { width: 100%; height: 100%; }
 .india-svg-map svg { width: 100%; height: 100%; }
 .state-path {
-  fill: rgba(19,136,8,.12); stroke: rgba(19,136,8,.3); stroke-width: 0.5;
-  transition: fill .2s, stroke .2s; cursor: pointer;
+  fill: #071a12; stroke: #00ff9c; stroke-width: 0.5;
+  transition: fill .3s, stroke .3s; cursor: pointer;
 }
-.state-path:hover { fill: rgba(19,136,8,.25); stroke: var(--accent-green-bright); stroke-width: 1; }
+.state-path:hover { fill: #0a2a1d; stroke: #00ffcc; stroke-width: 1; }
 .state-path.highlighted { fill: rgba(255,153,51,.2); stroke: var(--accent-saffron); }
-.state-tooltip {
-  position: absolute; background: rgba(0,0,0,.9); color: #fff; padding: 6px 10px;
-  border-radius: 4px; font-size: 11px; font-family: var(--mono-font);
-  pointer-events: none; z-index: 20; border: 1px solid var(--border-default);
-  backdrop-filter: blur(4px);
+
+/* --- Radar Sweep --- */
+.radar-sweep {
+  fill: rgba(0, 255, 156, 0.05);
+  pointer-events: none;
 }
+
+/* --- Legend --- */
+.map-legend {
+  position: absolute; bottom: 12px; right: 12px;
+  background: rgba(10,15,10,0.8); backdrop-filter: blur(8px);
+  padding: 10px; border: 1px solid var(--border-subtle);
+  border-radius: 4px; font-family: var(--mono-font); font-size: 10px;
+  z-index: 10;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.legend-color { width: 12px; height: 12px; border-radius: 2px; }
+
+/* --- Pulsing Marker --- */
+.city-marker {
+  fill: var(--accent-saffron);
+}
+.city-marker-pulse {
+  fill: var(--accent-saffron);
+  opacity: 0.4;
+  animation: marker-pulse 2s infinite;
+}
+@keyframes marker-pulse {
+  0% { r: 1; opacity: 0.4; }
+  100% { r: 6; opacity: 0; }
+}
+
+/* --- State Tooltip --- */
+.state-tooltip {
+  position: absolute; background: rgba(0,0,0,0.9); color: #fff; padding: 10px;
+  border-radius: 4px; font-size: 11px; font-family: var(--mono-font);
+  pointer-events: none; z-index: 100; border: 1px solid #00ff9c;
+  backdrop-filter: blur(10px); box-shadow: 0 0 15px rgba(0,255,156,0.2);
+  min-width: 150px;
+}
+.tooltip-row { display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px; }
+.tooltip-label { color: var(--text-secondary); }
+.tooltip-value { color: #00ff9c; font-weight: 600; }
 
 /* --- Panel Grid --- */
 .panel-grid {
@@ -386,6 +423,47 @@ body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-primary
 .aqi-unhealthy { color: #ef4444; }
 .aqi-very-unhealthy { color: #a855f7; }
 .aqi-hazardous { color: #991b1b; }
+
+/* --- Analytics Panel --- */
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+  gap: 16px;
+}
+.chart-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.chart-title {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.chart-period {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.chart-canvas-wrapper {
+  flex: 1;
+  position: relative;
+}
+.chart-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0 -12px;
+}
 
 /* --- Scrollbar for panels --- */
 .panel-body::-webkit-scrollbar { width: 4px; }

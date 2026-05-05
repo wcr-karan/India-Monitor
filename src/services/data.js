@@ -1,4 +1,5 @@
 // Data fetching services for India Monitor
+// Using environment variables for all API endpoints
 
 const RSS_PROXY = '/api/rss-proxy?url=';
 
@@ -7,9 +8,9 @@ const RSS_PROXY = '/api/rss-proxy?url=';
 // ============================================
 export async function fetchIndiaNews() {
   const feeds = [
-    { url: 'https://feeds.feedburner.com/ndtvnews-top-stories', source: 'NDTV' },
-    { url: 'https://timesofindia.indiatimes.com/rssfeedstopstories.cms', source: 'Times of India' },
-    { url: 'https://www.thehindu.com/news/national/feeder/default.rss', source: 'The Hindu' },
+    { url: import.meta.env.VITE_NEWS_FEED_NDTV, source: 'NDTV' },
+    { url: import.meta.env.VITE_NEWS_FEED_TOI, source: 'Times of India' },
+    { url: import.meta.env.VITE_NEWS_FEED_THEHINDU, source: 'The Hindu' },
   ];
 
   try {
@@ -34,9 +35,9 @@ export async function fetchIndiaNews() {
 // ============================================
 export async function fetchCricketNews() {
   const feeds = [
-    { url: 'https://www.espncricinfo.com/rss/content/story/feeds/0.xml', source: 'Cricinfo' },
-    { url: 'https://www.news18.com/rss/cricket.xml', source: 'News18' },
-    { url: 'https://sports.ndtv.com/rss/cricket', source: 'NDTV Sports' },
+    { url: import.meta.env.VITE_CRICKET_FEED_CRICINFO, source: 'Cricinfo' },
+    { url: import.meta.env.VITE_CRICKET_FEED_NEWS18, source: 'News18' },
+    { url: import.meta.env.VITE_CRICKET_FEED_NDTV, source: 'NDTV Sports' },
   ];
 
   try {
@@ -61,7 +62,7 @@ export async function fetchCricketNews() {
 // ============================================
 export async function fetchLiveScores() {
   try {
-    const res = await fetchRSS('http://static.cricinfo.com/rss/livescores.xml', 'Live Score');
+    const res = await fetchRSS(import.meta.env.VITE_CRICKET_LIVE_SCORES, 'Live Score');
     
     // Prioritize India and IPL matches
     const priorityKeywords = [
@@ -85,6 +86,7 @@ export async function fetchLiveScores() {
 }
 
 async function fetchRSS(url, sourceName) {
+  if (!url) return [];
   try {
     const res = await fetch(RSS_PROXY + encodeURIComponent(url), {
       signal: AbortSignal.timeout(8000),
@@ -145,7 +147,8 @@ export async function fetchWeather(cities) {
 
 async function fetchCityWeather(city) {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia/Kolkata`;
+    const baseUrl = import.meta.env.VITE_WEATHER_API_BASE_URL;
+    const url = `${baseUrl}?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia/Kolkata`;
     const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return getFallbackWeather(city.name);
     const data = await res.json();
