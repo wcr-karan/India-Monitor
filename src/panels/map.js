@@ -7,7 +7,7 @@ export function renderMap() {
   container.className = 'map-container';
   container.id = 'india-map';
 
-  // Toolbar
+  // Toolbar Section
   const toolbar = document.createElement('div');
   toolbar.className = 'map-toolbar';
 
