@@ -101,7 +101,7 @@ async function initD3Map(container) {
   svg.call(zoom);
 
   try {
-    const geoJsonUrl = import.meta.env.VITE_INDIA_GEOJSON_URL || '/src/data/india.json';
+    const geoJsonUrl = import.meta.env.VITE_INDIA_GEOJSON_URL || '/data/india.json';
     const data = await d3.json(geoJsonUrl);
     statesData = data.features;
 
