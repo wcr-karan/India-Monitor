@@ -62,6 +62,7 @@ export function renderMap() {
 
 let svg, g, projection, path, statesData;
 let currentMode = 'States';
+let selectedStateName = null;
 
 async function initD3Map(container) {
   const width = container.clientWidth || 800;
@@ -115,7 +116,7 @@ async function initD3Map(container) {
       .on('mouseenter', showTooltip)
       .on('mousemove', moveTooltip)
       .on('mouseleave', hideTooltip)
-      .on('click', (event, d) => console.log('Selected State:', d.properties.NAME_1));
+      .on('click', (event, d) => selectState(d.properties.NAME_1, event.currentTarget));
 
     // Radar Sweep Animation
     const radar = g.append('circle')
@@ -297,10 +298,15 @@ function moveTooltip(event) {
   tooltip.style.top = (event.clientY - rect.top - 10) + 'px';
 }
 
-function hideTooltip(event) {
+function hideTooltip(event, d) {
   const tooltip = document.getElementById('map-tooltip');
   tooltip.style.display = 'none';
-  d3.select(event.currentTarget).style('stroke', currentMode === 'States' ? '#00ff9c' : 'rgba(255,255,255,0.2)').style('stroke-width', 0.5);
+  
+  // If this is the currently selected state, preserve its highlighted stroke
+  const isSelected = d && d.properties && d.properties.NAME_1 === selectedStateName;
+  d3.select(event.currentTarget)
+    .style('stroke', isSelected ? 'var(--accent-saffron)' : (currentMode === 'States' ? '#00ff9c' : 'rgba(255,255,255,0.2)'))
+    .style('stroke-width', isSelected ? 2 : 0.5);
 }
 
 function mockValue(name, min, max) {
@@ -308,4 +314,66 @@ function mockValue(name, min, max) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return Math.abs(hash % (max - min)) + min;
+}
+
+function selectState(stateName, element) {
+  if (selectedStateName === stateName) {
+    clearStateSelection();
+    return;
+  }
+
+  selectedStateName = stateName;
+
+  // Apply visual focus in D3 map (glow effect on selected, dim others)
+  g.selectAll('.state-path')
+    .transition().duration(350)
+    .style('fill', d => d.properties.NAME_1 === stateName ? 'rgba(255, 153, 51, 0.25)' : '#020906')
+    .style('stroke', d => d.properties.NAME_1 === stateName ? 'var(--accent-saffron)' : 'rgba(0, 255, 156, 0.1)')
+    .style('stroke-width', d => d.properties.NAME_1 === stateName ? 2 : 0.5)
+    .attr('filter', d => d.properties.NAME_1 === stateName ? 'url(#neon-glow)' : null);
+
+  // Emit dynamic event
+  window.dispatchEvent(new CustomEvent('state-selected', { detail: { stateName } }));
+  updateResetButton();
+}
+
+function clearStateSelection() {
+  selectedStateName = null;
+
+  // Restore regular map styling based on mode
+  updateMapMode(currentMode);
+
+  window.dispatchEvent(new CustomEvent('state-cleared'));
+  updateResetButton();
+}
+
+function updateResetButton() {
+  const right = document.querySelector('.map-toolbar-right');
+  if (!right) return;
+
+  let resetBtn = document.getElementById('map-reset-btn');
+  if (selectedStateName) {
+    if (!resetBtn) {
+      resetBtn = document.createElement('button');
+      resetBtn.id = 'map-reset-btn';
+      resetBtn.className = 'header-btn';
+      resetBtn.style.padding = '3px 8px';
+      resetBtn.style.fontSize = '10px';
+      resetBtn.style.borderColor = 'var(--accent-saffron)';
+      resetBtn.style.color = 'var(--accent-saffron)';
+      resetBtn.style.background = 'rgba(255, 153, 51, 0.1)';
+      resetBtn.style.marginLeft = '10px';
+      resetBtn.style.cursor = 'pointer';
+      resetBtn.innerHTML = `FOCUS: ${selectedStateName.toUpperCase()} <span style="font-weight:bold;margin-left:4px;">✕</span>`;
+      resetBtn.onclick = (e) => {
+        e.stopPropagation();
+        clearStateSelection();
+      };
+      right.insertBefore(resetBtn, right.firstChild);
+    } else {
+      resetBtn.innerHTML = `FOCUS: ${selectedStateName.toUpperCase()} <span style="font-weight:bold;margin-left:4px;">✕</span>`;
+    }
+  } else {
+    if (resetBtn) resetBtn.remove();
+  }
 }
