@@ -40,43 +40,46 @@ export default defineConfig({
                   headers: {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
                     'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                   },
+                  redirect: 'follow',
                 });
                 const html = await response.text();
 
-                // Check if the page actually indicates a LIVE stream
-                const isLive =
-                  html.includes('"isLive":true') ||
-                  html.includes('"isLiveNow":true') ||
-                  html.includes('"isLiveContent":true') ||
-                  html.includes('BADGE_STYLE_TYPE_LIVE_NOW') ||
-                  html.includes('"style":"LIVE"') ||
-                  html.includes('"liveBroadcastDetails"');
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Access-Control-Allow-Origin', '*');
 
-                if (!isLive) {
-                  res.setHeader('Content-Type', 'application/json');
-                  res.setHeader('Access-Control-Allow-Origin', '*');
-                  res.end(JSON.stringify({ videoId: null, live: false }));
+                // Strategy 1: Parse ytInitialPlayerResponse (most reliable)
+                const playerMatch = html.match(/ytInitialPlayerResponse\s*=\s*(\{.+?\});/s);
+                if (playerMatch) {
+                  try {
+                    const playerData = JSON.parse(playerMatch[1]);
+                    const vd = playerData?.videoDetails;
+                    if (vd && (vd.isLive === true || vd.isLiveContent === true)) {
+                      res.end(JSON.stringify({ videoId: vd.videoId, live: true }));
+                      return;
+                    }
+                  } catch (_) { /* parse failed, fall through */ }
+                }
+
+                // Strategy 2: videoId near isLive marker
+                const liveVideoMatch = html.match(/"videoId"\s*:\s*"([a-zA-Z0-9_-]{11})"[^}]*?"isLive"\s*:\s*true/);
+                if (liveVideoMatch) {
+                  res.end(JSON.stringify({ videoId: liveVideoMatch[1], live: true }));
                   return;
                 }
 
-                // Extract video ID — canonical link first, then JSON patterns
-                const patterns = [
-                  /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})">/,
-                  /"videoId":"([a-zA-Z0-9_-]{11})"/,
-                  /watch\?v=([a-zA-Z0-9_-]{11})/,
-                  /\/embed\/([a-zA-Z0-9_-]{11})/,
-                ];
-
-                let videoId = null;
-                for (const pattern of patterns) {
-                  const match = html.match(pattern);
-                  if (match) { videoId = match[1]; break; }
+                // Strategy 3: Canonical URL + global live markers
+                const hasLive = html.includes('"isLive":true') || html.includes('"isLiveNow":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW');
+                if (hasLive) {
+                  const cm = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})">/);
+                  if (cm) {
+                    res.end(JSON.stringify({ videoId: cm[1], live: true }));
+                    return;
+                  }
                 }
 
-                res.setHeader('Content-Type', 'application/json');
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.end(JSON.stringify({ videoId, live: true }));
+                res.end(JSON.stringify({ videoId: null, live: false }));
                 return;
               } catch (e) {
                 console.error(`[YT Live] Error: ${e.message}`);
