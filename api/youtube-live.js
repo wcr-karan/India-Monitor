@@ -16,8 +16,25 @@ export default async function handler(req, res) {
     });
     const html = await response.text();
 
-    // YouTube embeds the canonical video ID in multiple places; try each pattern
+    // Check if the page actually indicates a LIVE stream
+    const isLive =
+      html.includes('"isLive":true') ||
+      html.includes('"isLiveNow":true') ||
+      html.includes('"isLiveContent":true') ||
+      html.includes('BADGE_STYLE_TYPE_LIVE_NOW') ||
+      html.includes('"style":"LIVE"') ||
+      html.includes('"liveBroadcastDetails"');
+
+    if (!isLive) {
+      // Channel exists but is NOT currently live-streaming
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=60');
+      return res.status(200).json({ videoId: null, live: false });
+    }
+
+    // Extract video ID — try canonical link first (most reliable), then JSON patterns
     const patterns = [
+      /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})">/,
       /"videoId":"([a-zA-Z0-9_-]{11})"/,
       /watch\?v=([a-zA-Z0-9_-]{11})/,
       /\/embed\/([a-zA-Z0-9_-]{11})/,
@@ -33,7 +50,9 @@ export default async function handler(req, res) {
     }
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(200).json({ videoId });
+    // Cache live results briefly so we don't hammer YouTube
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
+    res.status(200).json({ videoId, live: true });
   } catch (error) {
     console.error('[YT Live] Error:', error.message);
     res.status(500).json({ videoId: null, error: error.message });

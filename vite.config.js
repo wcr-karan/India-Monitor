@@ -44,8 +44,25 @@ export default defineConfig({
                 });
                 const html = await response.text();
 
-                // YouTube embeds the canonical video ID in multiple places; try each pattern
+                // Check if the page actually indicates a LIVE stream
+                const isLive =
+                  html.includes('"isLive":true') ||
+                  html.includes('"isLiveNow":true') ||
+                  html.includes('"isLiveContent":true') ||
+                  html.includes('BADGE_STYLE_TYPE_LIVE_NOW') ||
+                  html.includes('"style":"LIVE"') ||
+                  html.includes('"liveBroadcastDetails"');
+
+                if (!isLive) {
+                  res.setHeader('Content-Type', 'application/json');
+                  res.setHeader('Access-Control-Allow-Origin', '*');
+                  res.end(JSON.stringify({ videoId: null, live: false }));
+                  return;
+                }
+
+                // Extract video ID — canonical link first, then JSON patterns
                 const patterns = [
+                  /<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})">/,
                   /"videoId":"([a-zA-Z0-9_-]{11})"/,
                   /watch\?v=([a-zA-Z0-9_-]{11})/,
                   /\/embed\/([a-zA-Z0-9_-]{11})/,
@@ -59,7 +76,7 @@ export default defineConfig({
 
                 res.setHeader('Content-Type', 'application/json');
                 res.setHeader('Access-Control-Allow-Origin', '*');
-                res.end(JSON.stringify({ videoId }));
+                res.end(JSON.stringify({ videoId, live: true }));
                 return;
               } catch (e) {
                 console.error(`[YT Live] Error: ${e.message}`);
